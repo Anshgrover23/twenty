@@ -10,6 +10,7 @@
     "build": {
       "dependsOn": [
         "generateBarrels",
+        "buildCli",
         "^build"
       ],
       "outputs": [
@@ -17,6 +18,43 @@
         "{projectRoot}/application/package.json",
         "{projectRoot}/application/dist"
       ]
+    },
+    "beforeBuildCli": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "cwd": "packages/twenty-sdk",
+        "commands": [
+          "rimraf dist",
+          "tsc --project tsconfig.cli.json"
+        ]
+      },
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "buildCli": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "cwd": "packages/twenty-sdk",
+        "commands": [
+          "cp -R src/cli/constants/base-application-project dist/constants"
+        ]
+      },
+      "dependsOn": [
+        "beforeBuildCli"
+      ]
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build"
+      ],
+      "options": {
+        "cwd": "packages/twenty-sdk",
+        "command": "node dist/cli.js"
+      }
     },
     "generateBarrels": {
       "executor": "nx:run-commands",
